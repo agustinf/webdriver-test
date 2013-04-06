@@ -6,32 +6,29 @@ driver.manage.timeouts.implicit_wait = 10
 
 driver.get "http://www.lan.com/es_cl/sitio_personas/index.html#lan_pestaniasCajaDeCompras_pestaniaLanpass"
 box = driver.find_element(:css,"#lan_pestaniasCajaDeCompras_pestaniaLanpass")
-element = box.find_element :css => "[name=campoOrigen]"
-element.send_keys "SCL"
 
-#wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
-#first = wait.until { driver.find_element(:css => "[role=menuitem] a") }
-first = driver.find_element(:css => ".ui-autocomplete-autocompletarAeropuertosOrigenLanpass [role=menuitem] a")
-puts first.attribute('text')
-first.click
+def setAirport(airport, type, box, driver)
+	element = box.find_element :css => "[name=campo#{type}]"
+	element.send_keys airport
+	first = driver.find_element(:css => ".ui-autocomplete-autocompletarAeropuertos#{type}Lanpass [role=menuitem] a")
+	puts first.attribute('text')
+	first.click
+end
 
-element = box.find_element :css => "[name=campoDestino]"
-element.send_keys "BUE"
-first = driver.find_element(:css => ".ui-autocomplete-autocompletarAeropuertosDestinoLanpass [role=menuitem] a")
-puts first.attribute('text')
-first.click
+def setDate(date, type, box, driver)
+	driver.execute_script("document.getElementsByName('campoFecha#{type}')[2].removeAttribute('readonly');")
+	element = box.find_element(:name, "campoFecha#{type}")
+	element.clear
+	element.send_keys date
+end
 
-driver.execute_script("document.getElementsByName('campoFechaIda')[2].removeAttribute('readonly');")
-element = box.find_element(:name, "campoFechaIda")
-element.clear
-element.send_keys "21/ABR/2013"
 
-driver.execute_script("document.getElementsByName('campoFechaVuelta')[2].removeAttribute('readonly');")
-element = box.find_element(:name, "campoFechaVuelta")
-element.clear
-element.send_keys "29/ABR/2013"
+setAirport("SCL","Origen",box,driver)
+setAirport("BUE","Destino",box,driver)
+setDate("21/JUN/2013","Ida",box,driver)
+setDate("24/JUN/2013","Vuelta",box,driver)
+box.find_element(:css,"[type=submit]").click
 
-element.submit
 wait = Selenium::WebDriver::Wait.new(:timeout => 10)
 wait.until { driver.find_element(:name => "login") }
 
